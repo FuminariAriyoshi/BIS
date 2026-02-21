@@ -5,6 +5,7 @@ import { BrandData, Message, Project } from "../types";
 import html2canvas from 'html2canvas';
 import { callAI, parseAiResponse, buildConversationHistory, extractBrandFromConversation } from "@/lib/ai";
 import { PromptBox } from "@/components/ui/chatgpt-prompt-input";
+import BrandElementsTab from "./BrandElementsTab";
 
 // --- Board View Component ---
 const BoardView = ({ data, lang }: { data: BrandData; lang: 'en' | 'jp' }) => {
@@ -253,8 +254,8 @@ export default function ProjectView({ project, onProjectUpdate, onBack }: Projec
                     <button
                         onClick={() => setActiveTab('bis')}
                         className={`px-5 py-3 text-xs font-black uppercase tracking-wider border-b-2 transition-colors ${activeTab === 'bis'
-                                ? 'border-black text-black'
-                                : 'border-transparent text-zinc-400 hover:text-zinc-600'
+                            ? 'border-black text-black'
+                            : 'border-transparent text-zinc-400 hover:text-zinc-600'
                             }`}
                     >
                         <div className="flex items-center gap-2">
@@ -265,14 +266,14 @@ export default function ProjectView({ project, onProjectUpdate, onBack }: Projec
                     <button
                         onClick={() => setActiveTab('elements')}
                         className={`px-5 py-3 text-xs font-black uppercase tracking-wider border-b-2 transition-colors ${activeTab === 'elements'
-                                ? 'border-black text-black'
-                                : 'border-transparent text-zinc-400 hover:text-zinc-600'
+                            ? 'border-black text-black'
+                            : 'border-transparent text-zinc-400 hover:text-zinc-600'
                             }`}
                     >
                         <div className="flex items-center gap-2">
                             <Layers size={12} />
                             Brand Elements
-                            <span className="text-[8px] bg-zinc-100 text-zinc-400 px-1.5 py-0.5 rounded-full font-black">SOON</span>
+                            <span className="text-[8px] bg-gradient-to-r from-blue-500 to-violet-500 text-white px-1.5 py-0.5 rounded-full font-black">NEW</span>
                         </div>
                     </button>
                 </div>
@@ -297,18 +298,7 @@ export default function ProjectView({ project, onProjectUpdate, onBack }: Projec
                             <div className="h-32" />
                         </div>
                     ) : (
-                        <div className="flex flex-col items-center justify-center h-full">
-                            <div className="w-24 h-24 bg-white rounded-3xl flex items-center justify-center mb-6 shadow-sm border border-zinc-200">
-                                <Layers size={36} className="text-zinc-300" />
-                            </div>
-                            <h3 className="font-black text-lg mb-2">Brand Elements</h3>
-                            <p className="text-zinc-400 text-sm text-center max-w-md mb-2">
-                                BISに基づいたFont、Color、Logo、Illustration、Key Visual、Motion、Iconographyなどのブランドエレメントを提案します。
-                            </p>
-                            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-300 bg-zinc-100 px-3 py-1 rounded-full">
-                                Coming Soon
-                            </span>
-                        </div>
+                        <BrandElementsTab brand={currentBrand} />
                     )}
                 </div>
             </div>
