@@ -33,10 +33,81 @@ const BoardView = ({ data, lang }: { data: BrandData; lang: 'en' | 'jp' }) => {
                 </div>
 
                 <div className="flex-1 grid grid-cols-[180px_1fr] border-l-2 border-black">
-                    <div className="flex flex-col border-r-2 border-black bg-zinc-50/50">
-                        {["BRAND NAME", "ESSENCE", "CORE IDENTITY", "KEY VALUES", "PHILOSOPHY", "PRINCIPLES", "MANIFESTO"].map((label, i) => (
-                            <div key={i} className="flex-1 border-b border-zinc-200 p-2 text-[10px] font-black tracking-widest opacity-40">{label}</div>
-                        ))}
+                    <div className="flex flex-col border-r-2 border-black bg-zinc-50/50" style={{ fontFamily: 'Inter, sans-serif' }}>
+                        {/* Brand Name */}
+                        <div className="flex-1 border-b border-zinc-200 p-2 flex flex-col justify-center gap-0.5">
+                            <div style={{ fontSize: '20px', fontWeight: 500, fontFamily: 'Inter, sans-serif' }} className="leading-tight">
+                                Brand Name
+                            </div>
+                        </div>
+
+                        {/* Brand Essence — up to 3 English words, faded */}
+                        <div className="flex-1 border-b border-zinc-200 p-2 flex flex-col justify-center gap-0.5">
+                            <div style={{ fontSize: '20px', fontWeight: 500, fontFamily: 'Inter, sans-serif' }} className="leading-tight">
+                                Brand Essence
+                            </div>
+                            <div style={{ fontSize: '11px', fontWeight: 500, fontFamily: 'Inter, sans-serif', opacity: 0.3 }} className="leading-tight truncate">
+                                {lang === 'en' ? data.essence?.en || '—' : data.essence?.jp || '—'}
+                            </div>
+                        </div>
+
+                        {/* Core Identity — up to 2-word items × 3 */}
+                        <div className="flex-1 border-b border-zinc-200 p-2 flex flex-col justify-center gap-0.5">
+                            <div style={{ fontSize: '20px', fontWeight: 500, fontFamily: 'Inter, sans-serif' }} className="leading-tight">
+                                Core Identity
+                            </div>
+                            <div className="flex flex-col gap-0.5 mt-0.5">
+                                {(data.coreValues.length > 0 ? data.coreValues.slice(0, 3) : Array(3).fill({ title: '—' })).map((v: any, i: number) => (
+                                    <div key={i} style={{ fontSize: '10px', fontWeight: 500, fontFamily: 'Inter, sans-serif', opacity: 0.45 }} className="leading-none truncate">
+                                        {v.title || '—'}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Key Value — up to 2-word items × 3 */}
+                        <div className="flex-1 border-b border-zinc-200 p-2 flex flex-col justify-center gap-0.5">
+                            <div style={{ fontSize: '20px', fontWeight: 500, fontFamily: 'Inter, sans-serif' }} className="leading-tight">
+                                Key Value
+                            </div>
+                            <div className="flex flex-col gap-0.5 mt-0.5">
+                                {(data.coreValues.length > 0 ? data.coreValues.slice(0, 3) : Array(3).fill({ en: '—', jp: '—' })).map((v: any, i: number) => (
+                                    <div key={i} style={{ fontSize: '10px', fontWeight: 500, fontFamily: 'Inter, sans-serif', opacity: 0.45 }} className="leading-none truncate">
+                                        {lang === 'en' ? v.en || '—' : v.jp || '—'}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* BX Core Value */}
+                        <div className="flex-1 border-b border-zinc-200 p-2 flex flex-col justify-center gap-0.5">
+                            <div style={{ fontSize: '20px', fontWeight: 500, fontFamily: 'Inter, sans-serif' }} className="leading-tight">
+                                BX Core Value
+                            </div>
+                            <div style={{ fontSize: '10px', fontWeight: 500, fontFamily: 'Inter, sans-serif', opacity: 0.45 }} className="leading-tight">
+                                Defines the experiential truth
+                            </div>
+                        </div>
+
+                        {/* BX Design Philosophy */}
+                        <div className="flex-1 border-b border-zinc-200 p-2 flex flex-col justify-center gap-0.5">
+                            <div style={{ fontSize: '20px', fontWeight: 500, fontFamily: 'Inter, sans-serif' }} className="leading-tight">
+                                BX Design Philosophy
+                            </div>
+                            <div style={{ fontSize: '10px', fontWeight: 500, fontFamily: 'Inter, sans-serif', opacity: 0.45 }} className="leading-tight">
+                                Guides aesthetic decision-making
+                            </div>
+                        </div>
+
+                        {/* BX Design Principle */}
+                        <div className="flex-1 border-b border-zinc-200 p-2 flex flex-col justify-center gap-0.5">
+                            <div style={{ fontSize: '20px', fontWeight: 500, fontFamily: 'Inter, sans-serif' }} className="leading-tight">
+                                BX Design Principle
+                            </div>
+                            <div style={{ fontSize: '10px', fontWeight: 500, fontFamily: 'Inter, sans-serif', opacity: 0.45 }} className="leading-tight">
+                                Rules shaping visual expression
+                            </div>
+                        </div>
                     </div>
 
                     <div className="flex flex-col">
