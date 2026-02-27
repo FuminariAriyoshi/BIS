@@ -29,12 +29,12 @@ const SYSTEM_PROMPT = `あなたはユーザーの「ブランドや活動のア
 あくまで「自然な会話の流れ」で、状況に応じて自然な流れになるものから聞いていってください。
 
 1. name（プロジェクト・ブランドの名前）
-2. taglineLong（一言で表すキャッチフレーズ）
-3. definition（そのプロジェクトが何者か）
-4. coreValues（大切にしていること×3つ）
-5. bxPhilosophy（ひとことで表す「姿勢・哲学」）
-6. bxPrinciples（行動の基準×3つ）
-7. manifesto（自分への宣言×3つ）
+2. essence（ブランド・エッセンス：ブランドの魂や究極の約束。全ての活動の根源となる一言）
+3. coreIdentity（コア・アイデンティティ：ブランドが持つべき絶対的な性質。エッセンスを支える3本の柱）
+4. keyValue（キー・バリュー：顧客に提供する具体的な価値やベネフィット。何を得られるか）
+5. bxCoreValue（BXコア・バリュー：ブランド体験における核心的価値。体験の質を「＋」「－」「×」などのコンセプトで定義）
+6. bxPhilosophy（BXデザイン・フィロソフィー：デザイン全体の根本的な考え方・哲学）
+7. bxPrinciples（BXデザイン・プリンシパル：具体的な制作における判断基準・原則）
 
 ## 大事なルール：
 - 専門用語（タグライン、コアバリュー、マニフェスト、デザイン哲学など）は絶対に使わない。
@@ -53,19 +53,20 @@ const BOARD_EXTRACTION_PROMPT = `以下の会話履歴を読んで、ユーザ�
 プレースホルダーは絶対に使わないでください。必ず具体的な文章を入れてください。
 まだ会話に出ていない項目も、文脈から推測して埋めてください。
 
-## 各フィールドのフォーマット制約（厳守）
-- brand name.jp: 日本語版でのBrand Nameを行った場合のみ日本語訳を行う。そうでない場合は英語のまま。
-- essence.en: 最大3語の英単語のみ（例: "Quiet Bold Clarity"）。日本語・句読点不可。
-- essence.jp: 日本語で3語相当の短いフレーズにする。
-- coreValues[].title: 最大2語の英単語のみ（Core Identityラベル）。例: "Radical Honesty"。
-- coreValues[].en: 最大2語の英単語のみ（Key Valueラベル）。例: "Deep Focus"。
-- coreValues[].jp: 日本語で2語精度の言葉にする。
-- bxCoreValues[].title: 最大3語の英単語のみ（BX Core Valueラベル）。例: "Quiet Honest Craft"。
-- bxCoreValues[].en: 20文字以内の英語説明文（例: "Let truth shape the work."）。
-- bxCoreValues[].jp: 日本語で20文字以内の短い説明文。
-- bxPrinciples[].title: 最大3語の英単語のみ（例: "Form Follows Feeling"）。
-- bxPrinciples[].en: 20文字以内の英語説明文（例: "Let intuition guide form."）。
-- bxPrinciples[].jp: 日本語で20文字以内の短い説明文。
+## 各フィールドの定義と制約
+- name: ブランド名。jpは日本語訳、enは英語名。
+- essence: ブランド・エッセンス。ブランドの魂や究極の約束。全ての活動の根源となる一言。enは最大3語の英単語、jpは短いフレーズ。
+- coreValues[].title: コア・アイデンティティ。ブランドが持つべき絶対的な性質（エッセンスを支える柱）。最大3語の英単語。
+- coreValues[].en/jp: キー・バリュー。顧客に提供する具体的な価値（ユーザーが何を得られるか）。2語程度のフレーズ。
+- bxCoreValues: BXコア・バリュー。サービスを通じてユーザーが感じる体験の質を定義。titleは最大3語、en/jpは20文字以内の説明。
+- taglineLong: BXデザイン・フィロソフィー。デザイン全体の根本的な考え方・哲学。
+- bxPrinciples: BXデザイン・プリンシパル。具体的な制作における判断基準。デザイナーが迷った時に立ち返るルール。titleは最大3語、en/jpは20文字以内の説明。
+
+## フォーマット制約（厳守）
+- essence.en: 日本語・句読点不可。例: "Quiet Bold Clarity"。
+- coreValues[].title: 例: "Radical Honesty"。
+- bxCoreValues[].title: 例: "Quiet Honest Craft"。
+- bxPrinciples[].title: 例: "Form Follows Feeling"。
 
 以上のルールに従い、英語名とそれに対応する日本語名を必ずセットで生成してください。
 以下のJSON形式のみを出力してください。JSONの前後に説明文やマークダウンは一切含めないでください。純粋なJSONのみです。

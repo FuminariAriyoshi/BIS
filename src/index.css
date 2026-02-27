@@ -75,6 +75,8 @@
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
     --radius-sm: calc(var(--radius) - 4px);
+
+    --font-sans: "Inter", "Noto Sans JP", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 @layer base {
@@ -84,5 +86,6 @@
 
     body {
         @apply bg-background text-foreground;
+        font-family: var(--font-sans);
     }
 }
