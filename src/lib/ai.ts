@@ -41,6 +41,7 @@ const SYSTEM_PROMPT = `あなたはユーザーの「ブランドや活動のア
 - 強調や案を提示する際、Markdownの太字（**text**）は使用せず、必ず「」で囲んで表現してください。
 - 「ターゲットは誰ですか？」「目的は何ですか？」といった、背景情報を聞き出すだけの質問は禁止です。背景が気になったら、それすらも「あなたのターゲットは「これ」か「これ」じゃない？」と具体的な案でぶつけてください。
 - 「〜によって、考え方が変わってきます」といった、手順や理由の説明も不要です。余計な前置きを省き、すぐに本質的な指摘や提案に入ってください。
+- ユーザーのメッセージ内に「--- START OF FILE: ファイル名 ---」で囲まれたテキストがある場合、それはシステムがファイルから直接抽出した内容です。「ファイルは見られない」といった返答は**絶対に禁止**です。必ずその内容を詳細に読み解き、ブランド案や戦略の材料として活用してください。複数のファイルがある場合もすべて読み取ってください。
 
 ## 質問のスタイル（最重要）：
 メッセージの最後は、必ず2〜3個の具体的な「案」や「推測」を含んだ問いかけで終わらせてください。
@@ -52,9 +53,25 @@ const BOARD_EXTRACTION_PROMPT = `以下の会話履歴を読んで、ユーザ�
 プレースホルダーは絶対に使わないでください。必ず具体的な文章を入れてください。
 まだ会話に出ていない項目も、文脈から推測して埋めてください。
 
+## 各フィールドのフォーマット制約（厳守）
+- brand name.jp: 日本語版でのBrand Nameを行った場合のみ日本語訳を行う。そうでない場合は英語のまま。
+- essence.en: 最大3語の英単語のみ（例: "Quiet Bold Clarity"）。日本語・句読点不可。
+- essence.jp: 日本語で3語相当の短いフレーズにする。
+- coreValues[].title: 最大2語の英単語のみ（Core Identityラベル）。例: "Radical Honesty"。
+- coreValues[].en: 最大2語の英単語のみ（Key Valueラベル）。例: "Deep Focus"。
+- coreValues[].jp: 日本語で2語精度の言葉にする。
+- bxCoreValues[].title: 最大3語の英単語のみ（BX Core Valueラベル）。例: "Quiet Honest Craft"。
+- bxCoreValues[].en: 20文字以内の英語説明文（例: "Let truth shape the work."）。
+- bxCoreValues[].jp: 日本語で20文字以内の短い説明文。
+- bxPrinciples[].title: 最大3語の英単語のみ（例: "Form Follows Feeling"）。
+- bxPrinciples[].en: 20文字以内の英語説明文（例: "Let intuition guide form."）。
+- bxPrinciples[].jp: 日本語で20文字以内の短い説明文。
+
+以上のルールに従い、英語名とそれに対応する日本語名を必ずセットで生成してください。
 以下のJSON形式のみを出力してください。JSONの前後に説明文やマークダウンは一切含めないでください。純粋なJSONのみです。
 
-{"name":{"en":"英語名","jp":"日本語名"},"taglineLong":{"en":"英語キャッチ","jp":"日本語キャッチ"},"definition":{"en":"英語定義","jp":"日本語定義"},"coreValues":[{"title":"KEY1","en":"desc","jp":"説明"},{"title":"KEY2","en":"desc","jp":"説明"},{"title":"KEY3","en":"desc","jp":"説明"}],"bxPhilosophy":{"en":"英語","jp":"日本語"},"bxPrinciples":[{"title":"KEY1","en":"desc","jp":"説明"},{"title":"KEY2","en":"desc","jp":"説明"},{"title":"KEY3","en":"desc","jp":"説明"}],"manifesto":{"en":["s1","s2","s3"],"jp":["文1","文2","文3"]},"mission":{"en":"英語","jp":"日本語"},"vision":{"en":"英語","jp":"日本語"},"essence":{"en":"英語","jp":"日本語"}}`;
+{"name":{"en":"Brand Name","jp":"ブランド名"},"taglineLong":{"en":"Full tagline sentence","jp":"日本語キャッチコピー"},"definition":{"en":"Definition sentence","jp":"日本語定義"},"coreValues":[{"title":"Two Words","en":"Two Words","jp":"二語"},{"title":"Two Words","en":"Two Words","jp":"二語"},{"title":"Two Words","en":"Two Words","jp":"二語"}],"bxPhilosophy":{"en":"Philosophy sentence","jp":"哲学"},"bxCoreValues":[{"title":"Three Word Phrase","en":"Short desc under 20 chars.","jp":"20字以内の説明"},{"title":"Three Word Phrase","en":"Short desc under 20 chars.","jp":"20字以内の説明"},{"title":"Three Word Phrase","en":"Short desc under 20 chars.","jp":"20字以内の説明"}],"bxPrinciples":[{"title":"Three Word Phrase","en":"Short desc under 20 chars.","jp":"20字以内の説明"},{"title":"Three Word Phrase","en":"Short desc under 20 chars.","jp":"20字以内の説明"},{"title":"Three Word Phrase","en":"Short desc under 20 chars.","jp":"20字以内の説明"}],"manifesto":{"en":["s1","s2","s3"],"jp":["文1","文2","文3"]},"mission":{"en":"Mission statement","jp":"ミッション"},"vision":{"en":"Vision statement","jp":"ビジョン"},"essence":{"en":"Three Words Max","jp":"日本語三語相当"}}`;
+
 
 export function parseAiResponse(text: string): { message: string; brandUpdate: Partial<BrandData> | null } {
     console.log("=== Raw AI Response ===");

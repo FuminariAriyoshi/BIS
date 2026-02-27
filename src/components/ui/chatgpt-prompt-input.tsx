@@ -1,7 +1,11 @@
 import * as React from "react";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import { cn } from "@/lib/utils";
-import { Loader2 } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
+import * as pdfjsLib from 'pdfjs-dist';
+
+// pdfjs-dist の worker を CDN から読み込む
+pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 const TooltipProvider = TooltipPrimitive.Provider;
 const Tooltip = TooltipPrimitive.Root;
@@ -50,7 +54,9 @@ export interface PromptBoxProps extends React.TextareaHTMLAttributes<HTMLTextAre
 export const PromptBox = React.forwardRef<HTMLTextAreaElement, PromptBoxProps>(
     ({ className, value, onChange, onSubmit, loading, ...props }, ref) => {
         const [isListening, setIsListening] = React.useState(false);
+        const [isAttaching, setIsAttaching] = React.useState(false);
         const internalTextareaRef = React.useRef<HTMLTextAreaElement>(null);
+        const fileInputRef = React.useRef<HTMLInputElement>(null);
         const recognitionRef = React.useRef<any>(null);
         const valueRef = React.useRef(value);
 
@@ -60,6 +66,50 @@ export const PromptBox = React.forwardRef<HTMLTextAreaElement, PromptBoxProps>(
         React.useEffect(() => {
             valueRef.current = value;
         }, [value]);
+
+        const handleFileAttach = async (e: React.ChangeEvent<HTMLInputElement>) => {
+            const files = e.target.files;
+            if (!files || files.length === 0) return;
+            setIsAttaching(true);
+            try {
+                let combinedText = "";
+
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    let textContent = "";
+
+                    if (file.type === 'application/pdf') {
+                        const arrayBuffer = await file.arrayBuffer();
+                        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                            const page = await pdf.getPage(pageNum);
+                            const pageTextContent = await page.getTextContent();
+                            const pageText = pageTextContent.items.map((item: any) => item.str).join(" ");
+                            textContent += pageText + "\n";
+                        }
+                    } else {
+                        textContent = await file.text();
+                    }
+
+                    combinedText += `\n--- START OF FILE: ${file.name} ---\n${textContent}\n--- END OF FILE: ${file.name} ---\n`;
+                }
+
+                const currentVal = valueRef.current as string || "";
+                const newValue = currentVal + (currentVal ? "\n" : "") + combinedText;
+
+                const fakeEvent = {
+                    target: { value: newValue },
+                } as React.ChangeEvent<HTMLTextAreaElement>;
+
+                if (onChange) onChange(fakeEvent);
+            } catch (err) {
+                console.error("File parse error:", err);
+                alert("ファイルの読み込みに失敗しました。");
+            } finally {
+                setIsAttaching(false);
+                if (fileInputRef.current) fileInputRef.current.value = "";
+            }
+        };
 
         React.useLayoutEffect(() => {
             const textarea = internalTextareaRef.current;
@@ -157,9 +207,35 @@ export const PromptBox = React.forwardRef<HTMLTextAreaElement, PromptBoxProps>(
                     {...props}
                 />
 
+                <input
+                    type="file"
+                    multiple
+                    ref={fileInputRef}
+                    className="hidden"
+                    accept=".pdf,.txt,.csv,.md"
+                    onChange={handleFileAttach}
+                />
+
                 <div className="mt-0.5 p-1 pt-0">
                     <TooltipProvider delayDuration={100}>
                         <div className="flex items-center gap-2">
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <button
+                                        type="button"
+                                        onClick={() => fileInputRef.current?.click()}
+                                        disabled={isAttaching}
+                                        className="flex h-8 w-8 items-center justify-center rounded-full text-black opacity-40 transition-colors hover:bg-zinc-100 focus-visible:outline-none"
+                                    >
+                                        {isAttaching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-5 w-5" />}
+                                        <span className="sr-only">Attach file</span>
+                                    </button>
+                                </TooltipTrigger>
+                                <TooltipContent side="top" showArrow={true}>
+                                    <p>ファイルを添付</p>
+                                </TooltipContent>
+                            </Tooltip>
+
                             <div className="ml-auto flex items-center gap-2">
                                 <Tooltip>
                                     <TooltipTrigger asChild>

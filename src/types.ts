@@ -7,6 +7,7 @@ export interface BrandData {
     vision: { en: string; jp: string };
     essence: { en: string; jp: string };
     bxPhilosophy: { en: string; jp: string };
+    bxCoreValues: { title: string; en: string; jp: string }[];
     bxPrinciples: { title: string; en: string; jp: string }[];
     manifesto: { en: string[]; jp: string[] };
 }
@@ -37,6 +38,7 @@ export const initialEmptyData: BrandData = {
     vision: { en: "", jp: "" },
     essence: { en: "", jp: "" },
     bxPhilosophy: { en: "", jp: "" },
+    bxCoreValues: [],
     bxPrinciples: [],
     manifesto: { en: [], jp: [] }
 };

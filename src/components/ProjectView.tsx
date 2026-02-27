@@ -13,138 +13,162 @@ const BoardView = ({ data, lang }: { data: BrandData; lang: 'en' | 'jp' }) => {
 
     const download = async () => {
         if (!boardRef.current) return;
-        const canvas = await html2canvas(boardRef.current, { scale: 2 });
+        const canvas = await html2canvas(boardRef.current, {
+            scale: 2,
+            useCORS: true,
+            logging: true,
+            backgroundColor: '#ffffff'
+        });
         const link = document.createElement('a');
         link.download = `STRATEGIC_BOARD_${lang.toUpperCase()}_${data.name.en || 'UNNAMED'}.png`;
         link.href = canvas.toDataURL();
         link.click();
     };
 
+    const copyToClipboard = async () => {
+        if (!boardRef.current) return;
+        try {
+            const canvas = await html2canvas(boardRef.current, {
+                scale: 2,
+                useCORS: true,
+                logging: true,
+                backgroundColor: '#ffffff'
+            });
+            const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/png'));
+
+            if (!blob) {
+                throw new Error("Failed to create blob from canvas");
+            }
+
+            const item = new ClipboardItem({ "image/png": blob });
+            await navigator.clipboard.write([item]);
+            alert("Copied to clipboard! You can now paste it into Figma.");
+        } catch (err) {
+            console.error("Copy failed:", err);
+            alert("Failed to copy image. Please try again, or use the DOWNLOAD button.");
+        }
+    };
+
     return (
         <div className="flex flex-col items-center gap-4">
             <div
                 ref={boardRef}
-                className="w-[1200px] aspect-[16/9] bg-white border-2 border-black p-8 flex flex-col font-sans relative overflow-hidden"
-                style={{ backgroundImage: 'radial-gradient(#ddd 0.5px, transparent 0.5px)', backgroundSize: '20px 20px' }}
+                className="w-[1200px] h-[675px] border-2 border-black p-8 flex flex-col relative overflow-hidden"
+                style={{
+                    backgroundColor: '#ffffff',
+                    backgroundImage: 'radial-gradient(#ddd 0.5px, transparent 0.5px)',
+                    backgroundSize: '20px 20px',
+                    fontFamily: 'Inter, sans-serif',
+                    borderColor: '#000000'
+                }}
             >
-                <div className="flex justify-between border-b-2 border-black pb-2 mb-4">
-                    <div className="font-black text-xl tracking-tighter uppercase">{data.name.en || "Identity Pending"}</div>
-                    <div className="font-black text-[10px] tracking-[0.3em] text-zinc-400">STRATEGIC IDENTITY SYSTEM / {lang.toUpperCase()}</div>
+                <div className="flex justify-between border-b-2 border-black pb-2 mb-4" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500, borderColor: '#000000' }}>
+                    <div className="tracking-tighter uppercase" style={{ fontSize: '1em' }}>{data.name.en || "Identity Pending"}</div>
+                    <div className="tracking-[0.3em]" style={{ fontSize: '0.6em', fontWeight: 700, color: '#a1a1aa' }}>STRATEGIC IDENTITY SYSTEM / {lang.toUpperCase()}</div>
                 </div>
 
-                <div className="flex-1 grid grid-cols-[180px_1fr] border-l-2 border-black">
-                    <div className="flex flex-col border-r-2 border-black bg-zinc-50/50" style={{ fontFamily: 'Inter, sans-serif' }}>
+                <div className="flex-1 grid grid-cols-[180px_1fr] border-l-2 border-black" style={{ borderColor: '#000000' }}>
+                    <div className="flex flex-col border-r-2 border-black" style={{ fontFamily: 'Inter, sans-serif', backgroundColor: 'rgba(250, 250, 250, 0.5)', borderColor: '#000000' }}>
                         {/* Brand Name */}
-                        <div className="flex-1 border-b border-zinc-200 p-2 flex flex-col justify-center gap-0.5">
-                            <div style={{ fontSize: '20px', fontWeight: 500, fontFamily: 'Inter, sans-serif' }} className="leading-tight">
+                        <div className="flex-1 border-b p-2 flex flex-col justify-center" style={{ borderColor: '#e4e4e7' }}>
+                            <div style={{ fontSize: '1em', fontWeight: 500, fontFamily: 'Inter, sans-serif' }} className="leading-tight">
                                 Brand Name
                             </div>
                         </div>
 
-                        {/* Brand Essence — up to 3 English words, faded */}
-                        <div className="flex-1 border-b border-zinc-200 p-2 flex flex-col justify-center gap-0.5">
-                            <div style={{ fontSize: '20px', fontWeight: 500, fontFamily: 'Inter, sans-serif' }} className="leading-tight">
+                        {/* Brand Essence */}
+                        <div className="flex-1 border-b p-2 flex flex-col justify-center" style={{ borderColor: '#e4e4e7' }}>
+                            <div style={{ fontSize: '1em', fontWeight: 500, fontFamily: 'Inter, sans-serif' }} className="leading-tight">
                                 Brand Essence
                             </div>
-                            <div style={{ fontSize: '11px', fontWeight: 500, fontFamily: 'Inter, sans-serif', opacity: 0.3 }} className="leading-tight truncate">
-                                {lang === 'en' ? data.essence?.en || '—' : data.essence?.jp || '—'}
-                            </div>
                         </div>
 
-                        {/* Core Identity — up to 2-word items × 3 */}
-                        <div className="flex-1 border-b border-zinc-200 p-2 flex flex-col justify-center gap-0.5">
-                            <div style={{ fontSize: '20px', fontWeight: 500, fontFamily: 'Inter, sans-serif' }} className="leading-tight">
+                        {/* Core Identity */}
+                        <div className="flex-1 border-b p-2 flex flex-col justify-center" style={{ borderColor: '#e4e4e7' }}>
+                            <div style={{ fontSize: '1em', fontWeight: 500, fontFamily: 'Inter, sans-serif' }} className="leading-tight">
                                 Core Identity
                             </div>
-                            <div className="flex flex-col gap-0.5 mt-0.5">
-                                {(data.coreValues.length > 0 ? data.coreValues.slice(0, 3) : Array(3).fill({ title: '—' })).map((v: any, i: number) => (
-                                    <div key={i} style={{ fontSize: '10px', fontWeight: 500, fontFamily: 'Inter, sans-serif', opacity: 0.45 }} className="leading-none truncate">
-                                        {v.title || '—'}
-                                    </div>
-                                ))}
-                            </div>
                         </div>
 
-                        {/* Key Value — up to 2-word items × 3 */}
-                        <div className="flex-1 border-b border-zinc-200 p-2 flex flex-col justify-center gap-0.5">
-                            <div style={{ fontSize: '20px', fontWeight: 500, fontFamily: 'Inter, sans-serif' }} className="leading-tight">
+                        {/* Key Value */}
+                        <div className="flex-1 border-b p-2 flex flex-col justify-center" style={{ borderColor: '#e4e4e7' }}>
+                            <div style={{ fontSize: '1em', fontWeight: 500, fontFamily: 'Inter, sans-serif' }} className="leading-tight">
                                 Key Value
-                            </div>
-                            <div className="flex flex-col gap-0.5 mt-0.5">
-                                {(data.coreValues.length > 0 ? data.coreValues.slice(0, 3) : Array(3).fill({ en: '—', jp: '—' })).map((v: any, i: number) => (
-                                    <div key={i} style={{ fontSize: '10px', fontWeight: 500, fontFamily: 'Inter, sans-serif', opacity: 0.45 }} className="leading-none truncate">
-                                        {lang === 'en' ? v.en || '—' : v.jp || '—'}
-                                    </div>
-                                ))}
                             </div>
                         </div>
 
                         {/* BX Core Value */}
-                        <div className="flex-1 border-b border-zinc-200 p-2 flex flex-col justify-center gap-0.5">
-                            <div style={{ fontSize: '20px', fontWeight: 500, fontFamily: 'Inter, sans-serif' }} className="leading-tight">
+                        <div className="flex-1 border-b p-2 flex flex-col justify-center" style={{ borderColor: '#e4e4e7' }}>
+                            <div style={{ fontSize: '1em', fontWeight: 500, fontFamily: 'Inter, sans-serif' }} className="leading-tight">
                                 BX Core Value
-                            </div>
-                            <div style={{ fontSize: '10px', fontWeight: 500, fontFamily: 'Inter, sans-serif', opacity: 0.45 }} className="leading-tight">
-                                Defines the experiential truth
                             </div>
                         </div>
 
                         {/* BX Design Philosophy */}
-                        <div className="flex-1 border-b border-zinc-200 p-2 flex flex-col justify-center gap-0.5">
-                            <div style={{ fontSize: '20px', fontWeight: 500, fontFamily: 'Inter, sans-serif' }} className="leading-tight">
+                        <div className="flex-1 border-b p-2 flex flex-col justify-center" style={{ borderColor: '#e4e4e7' }}>
+                            <div style={{ fontSize: '1em', fontWeight: 500, fontFamily: 'Inter, sans-serif' }} className="leading-tight">
                                 BX Design Philosophy
-                            </div>
-                            <div style={{ fontSize: '10px', fontWeight: 500, fontFamily: 'Inter, sans-serif', opacity: 0.45 }} className="leading-tight">
-                                Guides aesthetic decision-making
                             </div>
                         </div>
 
                         {/* BX Design Principle */}
-                        <div className="flex-1 border-b border-zinc-200 p-2 flex flex-col justify-center gap-0.5">
-                            <div style={{ fontSize: '20px', fontWeight: 500, fontFamily: 'Inter, sans-serif' }} className="leading-tight">
+                        <div className="flex-1 border-b p-2 flex flex-col justify-center" style={{ borderColor: '#e4e4e7' }}>
+                            <div style={{ fontSize: '1em', fontWeight: 500, fontFamily: 'Inter, sans-serif' }} className="leading-tight">
                                 BX Design Principle
-                            </div>
-                            <div style={{ fontSize: '10px', fontWeight: 500, fontFamily: 'Inter, sans-serif', opacity: 0.45 }} className="leading-tight">
-                                Rules shaping visual expression
                             </div>
                         </div>
                     </div>
 
-                    <div className="flex flex-col">
-                        <div className="flex-1 border-b-2 border-black flex flex-col items-center justify-center bg-white">
-                            <h1 className="text-6xl font-black tracking-tighter uppercase">{lang === 'en' ? data.name.en : data.name.jp}</h1>
+                    <div className="flex flex-col" style={{ fontFamily: 'Inter, sans-serif' }}>
+                        {/* Brand Name */}
+                        <div className="flex-1 border-b-2 border-black flex flex-col items-center justify-center text-center" style={{ backgroundColor: '#ffffff', borderColor: '#000000' }}>
+                            <h1 style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: '1em' }} className="tracking-tighter uppercase">{lang === 'en' ? data.name.en : data.name.jp}</h1>
                         </div>
-                        <div className="flex-1 border-b border-zinc-200 flex flex-col items-center justify-center p-4 text-center">
-                            <div className="text-xl font-bold italic tracking-tight">{lang === 'en' ? data.taglineLong.en : data.taglineLong.jp}</div>
+                        {/* Brand Essence */}
+                        <div className="flex-1 border-b flex flex-col items-center justify-center p-4 text-center" style={{ borderColor: '#e4e4e7' }}>
+                            <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: '1em', color: '#a1a1aa' }}>{lang === 'en' ? data.essence?.en || data.taglineLong.en : data.essence?.jp || data.taglineLong.jp}</div>
                         </div>
-                        <div className="flex-1 border-b border-zinc-200 p-6 flex items-center">
-                            <p className="text-lg leading-relaxed font-medium">{lang === 'en' ? data.definition.en : data.definition.jp}</p>
-                        </div>
-                        <div className="flex-[1.5] border-b border-zinc-200 grid grid-cols-3">
-                            {(data.coreValues.length > 0 ? data.coreValues : Array(3).fill({ title: "-", en: "-", jp: "-" })).map((v, i) => (
-                                <div key={i} className="border-r border-zinc-200 p-4 last:border-r-0">
-                                    <div className="text-[10px] font-black mb-2 opacity-50">0{i + 1} / {v.title}</div>
-                                    <div className="font-bold text-sm leading-tight">{lang === 'en' ? v.en : v.jp}</div>
+                        {/* Core Identity */}
+                        <div className="flex-1 border-b grid grid-cols-3" style={{ borderColor: '#e4e4e7' }}>
+                            {(data.coreValues.length > 0 ? data.coreValues.slice(0, 3) : Array(3).fill({ title: '—' })).map((v: any, i: number) => (
+                                <div key={i} className="border-r last:border-r-0 flex items-center justify-center p-4 text-center" style={{ borderColor: '#e4e4e7' }}>
+                                    <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: '1em' }}>{v.title || '—'}</div>
                                 </div>
                             ))}
                         </div>
-                        <div className="flex-1 border-b border-zinc-200 p-4 flex items-center bg-zinc-50/30">
-                            <div className="text-xl font-black tracking-tight">{lang === 'en' ? data.bxPhilosophy.en : data.bxPhilosophy.jp}</div>
-                        </div>
-                        <div className="flex-1 border-b border-zinc-200 grid grid-cols-3">
-                            {(data.bxPrinciples.length > 0 ? data.bxPrinciples : Array(3).fill({ title: "-", en: "-", jp: "-" })).map((p, i) => (
-                                <div key={i} className="border-r border-zinc-200 p-4 last:border-r-0">
-                                    <div className="text-[10px] font-black mb-1 opacity-50">{p.title}</div>
-                                    <div className="font-bold text-xs">{lang === 'en' ? p.en : p.jp}</div>
+                        {/* Key Value */}
+                        <div className="flex-1 border-b grid grid-cols-3" style={{ borderColor: '#e4e4e7' }}>
+                            {(data.coreValues.length > 0 ? data.coreValues.slice(0, 3) : Array(3).fill({ en: '—', jp: '—' })).map((v: any, i: number) => (
+                                <div key={i} className="border-r last:border-r-0 flex items-center justify-center p-4 text-center" style={{ borderColor: '#e4e4e7' }}>
+                                    <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: '1em' }}>{lang === 'en' ? v.en || '—' : v.jp || '—'}</div>
                                 </div>
                             ))}
                         </div>
-                        <div className="flex-1 p-4 grid grid-cols-3 gap-4">
-                            {(data.manifesto[lang].length > 0 ? data.manifesto[lang] : ["-", "-", "-"]).map((l, i) => (
-                                <div key={i} className="text-[11px] font-bold leading-tight uppercase border-l border-black pl-2">{l}</div>
+                        {/* BX Core Value — 3 items */}
+                        <div className="flex-1 border-b grid grid-cols-3" style={{ backgroundColor: 'rgba(250, 250, 250, 0.3)', borderColor: '#e4e4e7' }}>
+                            {((data.bxCoreValues ?? []).length > 0 ? (data.bxCoreValues ?? []) : Array(3).fill({ title: '—', en: '—', jp: '—' })).map((v: any, i: number) => (
+                                <div key={i} className="border-r last:border-r-0 flex flex-col items-center justify-center p-4 text-center gap-1" style={{ borderColor: '#e4e4e7' }}>
+                                    <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: '1em' }} className="leading-tight">{v.title}</div>
+                                    <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: '0.75em', color: '#71717a' }} className="leading-tight">{lang === 'en' ? v.en : v.jp}</div>
+                                </div>
+                            ))}
+                        </div>
+                        {/* BX Design Philosophy */}
+                        <div className="flex-1 border-b flex items-center justify-center p-4 text-center" style={{ borderColor: '#e4e4e7' }}>
+                            <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: '1em' }}>{lang === 'en' ? data.taglineLong.en : data.taglineLong.jp}</div>
+                        </div>
+                        {/* BX Design Principle */}
+                        <div className="flex-1 border-b grid grid-cols-3" style={{ borderColor: '#e4e4e7' }}>
+                            {(data.bxPrinciples.length > 0 ? data.bxPrinciples : Array(3).fill({ title: '—', en: '—', jp: '—' })).map((p: any, i: number) => (
+                                <div key={i} className="border-r last:border-r-0 flex flex-col items-center justify-center p-4 text-center gap-1" style={{ borderColor: '#e4e4e7' }}>
+                                    <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: '1em' }} className="leading-tight">{p.title}</div>
+                                    <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: '0.75em', color: '#71717a' }} className="leading-tight">{lang === 'en' ? p.en : p.jp}</div>
+                                </div>
                             ))}
                         </div>
                     </div>
+
+
                 </div>
 
                 <div className="mt-4 flex justify-between text-[8px] font-bold uppercase tracking-widest opacity-50">
@@ -153,9 +177,14 @@ const BoardView = ({ data, lang }: { data: BrandData; lang: 'en' | 'jp' }) => {
                     <div>CONFIDENTIAL DOCUMENT</div>
                 </div>
             </div>
-            <Button onClick={download} variant="outline" className="gap-2">
-                <Download size={16} /> DOWNLOAD {lang.toUpperCase()} VERSION
-            </Button>
+            <div className="flex gap-4">
+                <Button onClick={download} variant="outline" className="gap-2 font-bold uppercase text-[10px] tracking-widest border-2 border-black rounded-none h-12 px-8">
+                    <Download size={16} /> DOWNLOAD {lang.toUpperCase()} VERSION
+                </Button>
+                <Button onClick={copyToClipboard} variant="outline" className="gap-2 font-bold uppercase text-[10px] tracking-widest border-2 border-black rounded-none h-12 px-8 bg-black text-white hover:bg-zinc-800">
+                    COPY PNG FOR FIGMA
+                </Button>
+            </div>
         </div>
     );
 };
